@@ -6,29 +6,29 @@ Unity plugin for using Android sensors.
 Usage
 ----
 
-See also: ./ExampleBehaviour directory.
+See also: [ExampleBehaviour/SensorBehaviour.cs](ExampleBehaviour/SensorBehaviour.cs).
 
-### Add plugin jar file
-Put ./library/release/AndroidSensorPlugin.jar to Unity Assets ( Assets/Plugins/Android/AndroidSensorPlugin.jar )
+### Add plugin jar file to Unity Assets
+Download [AndroidSensorPlugin.jar](library/release/AndroidSensorPlugin.jar) and put it into Unity Assets folder ( `Assets/Plugins/Android/AndroidSensorPlugin.jar` ).
 
-### Add code to script
-Add these codes to your Behaviour script, and this initializes the plugin.
+### Add codes to script
+Add these codes to your Behaviour script, and they initialize the plugin.
 ```c#
 using UnityEngine;
 
 ...
 
-	private AndroidJavaObject plugin;
+        private AndroidJavaObject plugin;
 
-	void Start ()
-	{
+        void Start ()
+        {
 #if UNITY_ANDROID
-		plugin = new AndroidJavaClass("jp.kshoji.unity.sensor.UnitySensorPlugin").CallStatic<AndroidJavaObject>("getInstance");
+                plugin = new AndroidJavaClass("jp.kshoji.unity.sensor.UnitySensorPlugin").CallStatic<AndroidJavaObject>("getInstance");
 #endif
-	}
+        }
 
-	void OnApplicationQuit ()
-	{
+        void OnApplicationQuit ()
+        {
 #if UNITY_ANDROID
 		if (plugin != null) {
 			plugin.Call("terminate");
@@ -41,8 +41,8 @@ using UnityEngine;
 To use `accelerometer` sensor, add these lines on the `Start` method.
 ```c#
 #if UNITY_ANDROID
-		if (plugin != null) {
-    		plugin.Call("startSensorListening", "accelerometer");
+        if (plugin != null) {
+                plugin.Call("startSensorListening", "accelerometer");
         }
 #endif
 ```
@@ -50,10 +50,40 @@ To use `accelerometer` sensor, add these lines on the `Start` method.
 To get sensor values, add these lines on `Update` method.
 ```c#
 #if UNITY_ANDROID
-		if (plugin != null) {
-			float[] sensorValue = plugin.Call<float[]>("getSensorValues", "accelerometer");
-        }
+	if (plugin != null) {
+		float[] sensorValue = plugin.Call<float[]>("getSensorValues", "accelerometer");
+	}
 #endif
+```
+
+### Tips
+If the app want to read sensor values more frequently, call `setSamplingPeriod` plugin method.
+The argument is in `micro seconds`.
+
+```c#
+	plugin.Call("setSamplingPeriod", 1000); // refreshes sensor 1 milli second each
+```
+
+And then, call `InvokeRepeating(string methodName, float time, float repeatRate)` method on Unity Behaviour's `Start` method.
+This makes enable more frequently method calling than game FPS.
+
+```c#
+        void Start ()
+        {
+                ... initializations here ...
+                
+                // wait 1.0 second, and call `CheckSensor` method at 1000Hz (1/0.001 Hz)
+                InvokeRepeating("CheckSensor", 1.0f, 0.001f);
+        }
+
+        void CheckSensor ()
+        {
+#if UNITY_ANDROID
+                if (plugin != null) {
+                        float[] sensorValue = plugin.Call<float[]>("getSensorValues", "accelerometer");
+                }
+#endif
+        }
 ```
 
 Available Sensors
