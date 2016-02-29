@@ -131,6 +131,22 @@ public final class UnitySensorPlugin {
     }
 
     /**
+     * Stop to listen sensor
+     * Called by Unity
+     *
+     * @param sensorKind sensor kind @see {@link Sensors}
+     * @return true if the listener is destroyed
+     */
+    public boolean stopSensorListening(String sensorKind) {
+        String sensorKindConverted = convertSensorKind(sensorKind);
+        if(eventListeners.containsKey(sensorKindConverted)) {
+            eventListeners.remove(sensorKindConverted);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Add sensor listener with callback
      * Called by Unity
      *
