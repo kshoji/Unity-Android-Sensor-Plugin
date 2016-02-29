@@ -86,6 +86,15 @@ This makes enable more frequently method calling than game FPS.
         }
 ```
 
+Verify if a sensor exist
+```c#
+#if UNITY_ANDROID
+       if (plugin.Call<bool>("hasSensor", "accelerometer") == true) {
+                Debug.log("accelerometer exist");
+       }
+#endif
+```
+
 Available Sensors
 ----
 * accelerometer

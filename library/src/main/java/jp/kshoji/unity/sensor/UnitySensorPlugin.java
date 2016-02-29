@@ -48,6 +48,32 @@ public final class UnitySensorPlugin {
     }
 
     /**
+     * Get if the sensor is valid
+     * Called by Unity
+     *
+     * @param sensorKind sensor kind @see {@link Sensors}
+     * @return true if the sensor exist
+     */
+
+    public boolean hasSensor(String sensorKind) {
+
+        Sensors specifiedSensor;
+        try {
+            specifiedSensor = Sensors.valueOf(sensorKind);
+        } catch (IllegalArgumentException e) {
+            // valueOf failed
+            Log.e(getClass().getName(), "Bad sensor type: " + sensorKind + ", available types: " + Arrays.toString(Sensors.values()));
+            return false;
+        }
+
+       if( sensorManager.getDefaultSensor( specifiedSensor.getSensorType() ) == null) {
+              return false;
+       }
+
+        return true;
+    }
+    
+    /**
      * Terminates instance
      * Must be called on App's last use.
      * Called by Unity
@@ -102,6 +128,22 @@ public final class UnitySensorPlugin {
      */
     public void startSensorListening(String sensorKind) {
         addSensorEventListener(sensorKind, null, null);
+    }
+
+    /**
+     * Stop to listen sensor
+     * Called by Unity
+     *
+     * @param sensorKind sensor kind @see {@link Sensors}
+     * @return true if the listener is destroyed
+     */
+    public boolean stopSensorListening(String sensorKind) {
+        String sensorKindConverted = convertSensorKind(sensorKind);
+        if(eventListeners.containsKey(sensorKindConverted)) {
+            eventListeners.remove(sensorKindConverted);
+            return true;
+        }
+        return false;
     }
 
     /**

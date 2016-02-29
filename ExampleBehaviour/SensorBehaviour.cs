@@ -30,10 +30,12 @@ public class SensorBehaviour : MonoBehaviour
 	{
 #if UNITY_ANDROID
 		if (plugin != null) {
-			float[] sensorValue = plugin.Call<float[]>("getSensorValues", "accelerometer");
-			if (sensorValue != null) {
-				Debug.Log("sensorValue:" + string.Join(",", new List<float>(sensorValue).ConvertAll(i => i.ToString()).ToArray()));
-			}
+            if (plugin.Call<bool>("hasSensor", "accelerometer") == true) {
+			    float[] sensorValue = plugin.Call<float[]>("getSensorValues", "accelerometer");
+			    if (sensorValue != null) {
+				    Debug.Log("sensorValue:" + string.Join(",", new List<float>(sensorValue).ConvertAll(i => i.ToString()).ToArray()));
+			    }
+            }
 		}
 #endif
 	}
